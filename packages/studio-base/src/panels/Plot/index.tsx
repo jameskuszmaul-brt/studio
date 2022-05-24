@@ -17,7 +17,7 @@ import { InputBase, Typography } from "@mui/material";
 import produce from "immer";
 import { compact, set, uniq } from "lodash";
 import memoizeWeak from "memoize-weak";
-import { useEffect, useCallback, useMemo, ComponentProps, ChangeEvent } from "react";
+import { useEffect, useCallback, useMemo, useState, ComponentProps, ChangeEvent } from "react";
 
 import { filterMap } from "@foxglove/den/collection";
 import { useShallowMemo } from "@foxglove/hooks";
@@ -468,6 +468,11 @@ function Plot(props: Props) {
     });
   }, [actionHandler, config, panelId, updatePanelSettingsTree]);
 
+  const stackDirection = useMemo(
+    () => (legendDisplay === "top" ? "column" : "row"),
+    [legendDisplay],
+  );
+
   const handleTitleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       saveConfig({ title: event.target.value });
@@ -475,9 +480,17 @@ function Plot(props: Props) {
     [saveConfig],
   );
 
-  const stackDirection = useMemo(
-    () => (legendDisplay === "top" ? "column" : "row"),
-    [legendDisplay],
+  const [titleEditable, setTitleEditable] = useState(false);
+
+  const onTitleMouseDown = useCallback(
+    (event: React.MouseEvent) => {
+      // Make title editable on double click.
+      if (event.detail > 1) {
+        event.preventDefault();
+        setTitleEditable(true);
+      }
+    },
+    [setTitleEditable],
   );
 
   return (
@@ -499,8 +512,22 @@ function Plot(props: Props) {
           </ToolbarIconButton>
         }
       >
-        <Typography noWrap variant="body2" color="text.secondary" flex="auto">
+        <Typography
+          component="div"
+          noWrap
+          variant="body2"
+          color="text.secondary"
+          flex="auto"
+          onMouseDown={onTitleMouseDown}
+        >
           <InputBase
+            onBlur={() => setTitleEditable(false)}
+            onKeyUp={(event) => {
+              if (event.key === "Enter") {
+                setTitleEditable(false);
+              }
+            }}
+            readOnly={!titleEditable}
             value={title}
             style={{ width: "100%", fontSize: "inherit", color: "inherit" }}
             onChange={handleTitleChange}
