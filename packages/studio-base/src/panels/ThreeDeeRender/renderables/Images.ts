@@ -244,7 +244,17 @@ export class Images extends THREE.Object3D {
             log.debug(
               `Creating texture for ${bitmap.width}x${bitmap.height} camera image on "${topic}"`,
             );
-            const texture = new THREE.CanvasTexture(bitmap);
+            const texture = new THREE.CanvasTexture(
+              bitmap,
+              THREE.UVMapping,
+              THREE.ClampToEdgeWrapping,
+              THREE.ClampToEdgeWrapping,
+              THREE.NearestFilter,
+              THREE.LinearMipmapLinearFilter,
+              THREE.RGBFormat,
+              THREE.UnsignedByteType,
+            );
+            texture.encoding = THREE.sRGBEncoding;
             renderable.userData.texture = texture;
             rebuildMaterial(renderable);
             tryCreateMesh(renderable);
