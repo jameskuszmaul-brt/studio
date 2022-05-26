@@ -13,11 +13,11 @@
 
 import { useTheme } from "@fluentui/react";
 import ArrowDownBoldIcon from "@mdi/svg/svg/arrow-down-bold.svg";
-import { InputBase, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import produce from "immer";
 import { compact, set, uniq } from "lodash";
 import memoizeWeak from "memoize-weak";
-import { useEffect, useCallback, useMemo, ComponentProps, ChangeEvent } from "react";
+import { useEffect, useCallback, useMemo, ComponentProps } from "react";
 
 import { filterMap } from "@foxglove/den/collection";
 import { useShallowMemo } from "@foxglove/hooks";
@@ -468,13 +468,6 @@ function Plot(props: Props) {
     });
   }, [actionHandler, config, panelId, updatePanelSettingsTree]);
 
-  const handleTitleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      saveConfig({ title: event.target.value });
-    },
-    [saveConfig],
-  );
-
   const stackDirection = useMemo(
     () => (legendDisplay === "top" ? "column" : "row"),
     [legendDisplay],
@@ -500,11 +493,7 @@ function Plot(props: Props) {
         }
       >
         <Typography noWrap variant="body2" color="text.secondary" flex="auto">
-          <InputBase
-            value={title}
-            style={{ width: "100%", fontSize: "inherit", color: "inherit" }}
-            onChange={handleTitleChange}
-          />
+          {title}
         </Typography>
       </PanelToolbar>
       <Stack
@@ -548,7 +537,7 @@ function Plot(props: Props) {
 }
 
 const defaultConfig: PlotConfig = {
-  title: "Timeseries plot",
+  title: "Plot",
   paths: [{ value: "", enabled: true, timestampMethod: "receiveTime" }],
   minYValue: "",
   maxYValue: "",
